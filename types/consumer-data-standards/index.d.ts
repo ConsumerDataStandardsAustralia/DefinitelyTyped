@@ -1,12 +1,14 @@
 // Type definitions for consumer-data-standards 2.0
-// Project: https://github.com/ConsumerDataStandardsAustralia \s\s+
+// Project: https://github.com/ConsumerDataStandardsAustralia  \s\s+
 // Definitions by: Tomas Schier <https://github.com/tom-schier>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-export * from './banking';
-export * from './common';
-export * from './dcr';
-export * from './energy';
-export * from './admin';
+// Minimum Typescript Version: 3.7
+
+export *  from "./admin";
+export *  from "./banking";
+export *  from "./common";
+export *  from "./energy";
+export *  from "./dcr";
 export { DataHoldersStatusList, DataHolderStatus, DataRecipientBrandMetaData,
     Links, LinksPaginated, DataRecipientsStatusList, DataRecipientStatus,
     Error, JWK, LegalEntityDetail, Meta, MetaError, MetaPaginated,
