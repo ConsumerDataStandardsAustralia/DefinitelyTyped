@@ -1,5 +1,5 @@
-// Type definitions for non-npm package consumer-data-standards-browser 2.0
-// Project: https://github.com/ConsumerDataStandardsAustralia
+// Type definitions for consumer-data-standards 2.0
+// Project: https://github.com/ConsumerDataStandardsAustralia \s\s+
 // Definitions by: Tomas Schier <https://github.com/tom-schier>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 export * from './banking';
