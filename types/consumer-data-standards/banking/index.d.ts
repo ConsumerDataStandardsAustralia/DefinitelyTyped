@@ -8216,11 +8216,11 @@ export interface ResponseBankingTransactionList {
          * The total number of records in the full set. See [pagination](#pagination).
          */
         totalRecords: number;
-        [k: string]: unknown;
         /**
          * true if "text" query parameter is not supported
          */
         isQueryParamUnsupported?: boolean | null;
+        [k: string]: unknown;
     };
     [k: string]: unknown;
 }
