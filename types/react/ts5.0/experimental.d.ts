@@ -42,10 +42,22 @@ declare const UNDEFINED_VOID_ONLY: unique symbol;
 type VoidOrUndefinedOnly = void | { [UNDEFINED_VOID_ONLY]: never };
 
 declare module "." {
-    // Need an interface to not cause ReactNode to be a self-referential type.
-    interface PromiseLikeOfReactNode extends PromiseLike<ReactNode> {}
+    /**
+     * @internal Use `Awaited<ReactNode>` instead
+     */
+    // Helper type to enable `Awaited<ReactNode>`.
+    // Must be a copy of the non-thenables of `ReactNode`.
+    type AwaitedReactNode =
+        | ReactElement
+        | string
+        | number
+        | Iterable<AwaitedReactNode>
+        | ReactPortal
+        | boolean
+        | null
+        | undefined;
     interface DO_NOT_USE_OR_YOU_WILL_BE_FIRED_EXPERIMENTAL_REACT_NODES {
-        promises: PromiseLikeOfReactNode;
+        promises: Promise<AwaitedReactNode>;
     }
 
     export interface SuspenseProps {
@@ -110,33 +122,10 @@ declare module "." {
      * @see https://reactjs.org/docs/concurrent-mode-reference.html#suspenselist
      * @see https://reactjs.org/docs/concurrent-mode-patterns.html#suspenselist
      */
-    export const SuspenseList: ExoticComponent<SuspenseListProps>;
+    export const unstable_SuspenseList: ExoticComponent<SuspenseListProps>;
 
-    // tslint:disable-next-line ban-types
+    // eslint-disable-next-line @typescript-eslint/ban-types
     export function experimental_useEffectEvent<T extends Function>(event: T): T;
-
-    interface DO_NOT_USE_OR_YOU_WILL_BE_FIRED_EXPERIMENTAL_FORM_ACTIONS {
-        functions: (formData: FormData) => void;
-    }
-
-    export interface TransitionStartFunction {
-        /**
-         * Marks all state updates inside the async function as transitions
-         *
-         * @see {https://react.dev/reference/react/ts5.0/useTransition#starttransition}
-         *
-         * @param callback
-         */
-        (callback: () => Promise<VoidOrUndefinedOnly>): void;
-    }
-
-    function experimental_useOptimistic<State>(
-        passthrough: State,
-    ): [State, (action: State | ((pendingState: State) => State)) => void];
-    function experimental_useOptimistic<State, Action>(
-        passthrough: State,
-        reducer: (state: State, action: Action) => State,
-    ): [State, (action: Action) => void];
 
     type Reference = object;
     type TaintableUniqueValue = string | bigint | ArrayBufferView;

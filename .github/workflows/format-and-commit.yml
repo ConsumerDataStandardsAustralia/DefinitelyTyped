@@ -12,6 +12,7 @@ on:
 jobs:
   dprint-fmt:
     runs-on: ubuntu-latest
+    if: github.repository == 'DefinitelyTyped/DefinitelyTyped'
     steps:
     - uses: actions/checkout@v4
       with:
@@ -47,3 +48,4 @@ jobs:
         commit_message: "🤖 dprint fmt"
         commit_user_email: "typescriptbot@microsoft.com"
         commit_user_name: "TypeScript Bot"
+

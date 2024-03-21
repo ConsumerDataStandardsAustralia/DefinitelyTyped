@@ -1,10 +1,14 @@
 /// <reference types="../canary"/>
+import React = require("react");
+import ReactDOM = require("react-dom");
+import ReactDOMClient = require("react-dom/client");
 
 function preloadTest() {
     function Component() {
         ReactDOM.preload("foo", { as: "style", fetchPriority: "high", integrity: "sad" });
         ReactDOM.preload("bar", {
             as: "font",
+            type: "font/woff2",
             // @ts-expect-error Unknown fetch priority
             fetchPriority: "unknown",
         });
@@ -98,4 +102,159 @@ function preloadTest() {
             as: "json",
         });
     }
+}
+
+const useFormState = ReactDOM.useFormState;
+const useFormStatus = ReactDOM.useFormStatus;
+
+function Status() {
+    const status = useFormStatus();
+    if (!status.pending) {
+        return <div>No pending action</div>;
+    } else {
+        const { action, data, method } = status;
+        const foo = data.get("foo");
+        return (
+            <div>
+                {`Pending action ${
+                    typeof action === "string" ? action : action.name
+                }: foo is ${foo}, method is ${method}`}
+            </div>
+        );
+    }
+}
+
+function formTest() {
+    function Page1() {
+        async function action(state: number) {
+            return state + 1;
+        }
+
+        const [
+            // $ExpectType number
+            state,
+            dispatch,
+        ] = useFormState(action, 1);
+
+        function actionExpectingPromiseState(state: Promise<number>) {
+            return state.then((s) => s + 1);
+        }
+
+        useFormState(
+            // @ts-expect-error
+            actionExpectingPromiseState,
+            Promise.resolve(1),
+        );
+        useFormState(
+            action,
+            // @ts-expect-error
+            Promise.resolve(1),
+        );
+        // $ExpectType number
+        useFormState<Promise<number>>(action, 1)[0];
+
+        useFormState(
+            async (
+                prevState: // only needed in TypeScript 4.9
+                    // 5.0 infers `number` whereas 4.9 infers `0`
+                    number,
+            ) => prevState + 1,
+            0,
+        )[0];
+        // $ExpectType number
+        useFormState(
+            async (prevState) => prevState + 1,
+            // @ts-expect-error
+            Promise.resolve(0),
+        )[0];
+
+        useFormState(
+            async (state: React.ReactNode, payload: FormData): Promise<React.ReactNode> => {
+                return state;
+            },
+            (
+                <button>
+                    New Project
+                </button>
+            ),
+        );
+
+        return (
+            <button
+                onClick={() => {
+                    dispatch();
+                }}
+            >
+                count: {state}
+            </button>
+        );
+    }
+
+    function Page2() {
+        async function action(state: number) {
+            return state + 1;
+        }
+
+        const [
+            // $ExpectType number
+            state,
+            dispatch,
+        ] = useFormState(action, 1, "/permalink");
+        return (
+            <form action={dispatch}>
+                <span>Count: {state}</span>
+                <input type="text" name="incrementAmount" defaultValue="5" />
+            </form>
+        );
+    }
+
+    function Page3() {
+        function actionSync(state: number, type: "increment" | "decrement") {
+            return state + (type === "increment" ? 1 : -1);
+        }
+
+        const [
+            // $ExpectType number
+            state,
+            dispatch,
+        ] = useFormState(actionSync, 1, "/permalink");
+        return (
+            <button
+                onClick={() => {
+                    dispatch("decrement");
+                }}
+            >
+                count: {state}
+            </button>
+        );
+    }
+
+    function Page4() {
+        async function action(state: number, type: "increment" | "decrement") {
+            return state + (type === "increment" ? 1 : -1);
+        }
+
+        const [
+            // $ExpectType number
+            state,
+            dispatch,
+        ] = useFormState(action, 1, "/permalink");
+        return (
+            <button
+                onClick={() => {
+                    dispatch("decrement");
+                }}
+            >
+                count: {state}
+            </button>
+        );
+    }
+
+    const formState = [1, "", "", 0] as unknown as ReactDOMClient.ReactFormState;
+    ReactDOMClient.hydrateRoot(document.body, <Page1 />, { formState });
+}
+
+function createRoot(validContainer: Element | DocumentFragment | Document) {
+    ReactDOMClient.createRoot(document);
+    ReactDOMClient.createRoot(validContainer);
 }
