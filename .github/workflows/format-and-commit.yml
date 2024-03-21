@@ -12,8 +12,9 @@ on:
 jobs:
   dprint-fmt:
     runs-on: ubuntu-latest
+    if: github.repository == 'DefinitelyTyped/DefinitelyTyped'
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         # Use the bot token so that CI triggers on pushes; we want to know if formatting broke something.
         token: ${{ secrets.GH_DT_MERGEBOT_TOKEN }}
@@ -41,9 +42,10 @@ jobs:
 
     - run: npx dprint fmt
 
-    - uses: stefanzweifel/git-auto-commit-action@v5.0.0
+    - uses: stefanzweifel/git-auto-commit-action@v4.16.0
       with:
         commit_author: "TypeScript Bot <typescriptbot@microsoft.com>"
         commit_message: "🤖 dprint fmt"
         commit_user_email: "typescriptbot@microsoft.com"
         commit_user_name: "TypeScript Bot"
+
